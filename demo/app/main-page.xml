@@ -1,9 +1,17 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:Tags="nativescript-tag">
   <StackLayout>
     <Label text="{{ message }}" class="message" textWrap="true"/>
-    <Tags:TagGroup atg_isAppendMode="true" value="{{ tags }}" />
+
+    <Label text="Editables" textWrap="true" />    
+    <Tags:TagGroup ntag_editMode="true" value="{{ tags }}" ntag_borderColor="#2095F2" ntag_textColor="#2095F2" ntag_backgroundColor="#ffffff" ntag_checkedBorderColor="#2095F2" ntag_checkedBackgroundColor="#2095F2" ntag_checkedTextColor="#ffffff" />
+
+    <Label text="Read-onlys" textWrap="true" />    
+    <Tags:TagGroup ntag_tagClick="onTagClick" value="{{ tags }}" />
+
     <Button text="Chinese Music" tap="{{ chinese }}" />
     <Button text="Western Music" tap="{{ western }}" />
+    <Button text="Get Values" tap="onGetValues" />
+    
     
   </StackLayout>
 </Page>

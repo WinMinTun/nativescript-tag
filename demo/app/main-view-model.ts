@@ -23,7 +23,7 @@ export class HelloWorldModel extends Observable {
   }
 
   public chinese() {
-    this.tags = ['古琴', '二胡', '古筝'];
+    this.tags = ['古琴', '二胡', '古筝', '琵琶'];
   }
 
   public western() {

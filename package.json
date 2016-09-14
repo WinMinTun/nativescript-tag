@@ -1,7 +1,7 @@
 {
   "name": "nativescript-tag",
   "version": "1.0.0",
-  "description": "Your awesome NativeScript plugin.",
+  "description": "NativeScript UI plugin for tagging",
   "main": "tag.js",
   "typings": "index.d.ts",
   "nativescript": {
@@ -20,26 +20,30 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/win_min_tun/nativescript-tag.git"
+    "url": "https://bitbucket.org/win_min_tun/nativescript-tag.git"
   },
   "keywords": [
+    "NativeScript Tag",
+    "NativeScript Tagging",
     "NativeScript",
     "JavaScript",
     "Android",
-    "iOS"
+    "iOS",
+    "Tag",
+    "Tagging"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "youremail@yourdomain.com"
+    "name": "Win Min Tun",
+    "email": "sawrochelais@gmail.com"
   },
   "bugs": {
-    "url": "https://github.com/win_min_tun/nativescript-tag/issues"
+    "url": "https://bitbucket.org/win_min_tun/nativescript-tag/issues"
   },
   "license": {
     "type": "MIT",
     "url": "https://github.com/win_min_tun/nativescript-tag/blob/master/LICENSE"
   },
-  "homepage": "https://github.com/win_min_tun/nativescript-tag",
+  "homepage": "https://bitbucket.org/win_min_tun/nativescript-tag",
   "readmeFilename": "README.md",
   "devDependencies": {
     "tns-core-modules": "^2.2.0",

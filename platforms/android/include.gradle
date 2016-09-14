@@ -9,5 +9,5 @@ android {
 
 //optional elements
 dependencies {
-    compile 'me.gujun.android.taggroup:library:1.5@aar'
+    compile 'me.gujun.android.taggroup:library:1.4@aar'
 }
