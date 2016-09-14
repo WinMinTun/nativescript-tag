@@ -1,0 +1,13 @@
+//default elements
+android {
+  productFlavors {
+    "nativescript-tag" {
+      dimension "nativescript-tag"
+    }
+  }
+}
+
+//optional elements
+dependencies {
+    compile 'me.gujun.android.taggroup:library:1.5@aar'
+}

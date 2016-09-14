@@ -1,0 +1,9 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:Tags="nativescript-tag">
+  <StackLayout>
+    <Label text="{{ message }}" class="message" textWrap="true"/>
+    <Tags:TagGroup atg_isAppendMode="true" value="{{ tags }}" />
+    <Button text="Chinese Music" tap="{{ chinese }}" />
+    <Button text="Western Music" tap="{{ western }}" />
+    
+  </StackLayout>
+</Page>
