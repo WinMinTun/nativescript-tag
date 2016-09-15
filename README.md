@@ -5,7 +5,7 @@
 Currently only support Android. Any collaborator for iOS support is welcomed!
 
 ##Android side
-![alt tag](https://bitbucket.org/win_min_tun/nativescript-tag/blob/master/demo/screenshots/Android.png)
+![alt tag](https://bytebucket.org/win_min_tun/nativescript-tag/raw/a498db5bf1dfba22dc13e50b6f275af72ba8561a/demo/screenshots/Android.png)
 
 ## Usage
 
