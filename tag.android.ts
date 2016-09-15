@@ -124,7 +124,7 @@ export class TagGroup extends common.TagGroup {
                 var instance = that.get();
                 if (instance) {
                     let newTags = new java.util.ArrayList(java.util.Arrays.asList(tagGroup.getTags()));
-                    newTags.add(newTag);
+                    // notify TagGroup.value of the native change
                     instance._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
                 }
             },
@@ -133,8 +133,7 @@ export class TagGroup extends common.TagGroup {
                 var instance = that.get();
                 if (instance) {
                     let newTags = new java.util.ArrayList(java.util.Arrays.asList(tagGroup.getTags()));
-                    newTags.remove(deletedTag);
-
+                    // notify TagGroup.value of the native change
                     instance._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
                 }
             }
@@ -148,6 +147,7 @@ export class TagGroup extends common.TagGroup {
             onTagClick: function(tag: string) {
                 let instance = that.get();
                 if(instance) {
+                    console.log(instance.ntag_tagClick);
                     instance.ntag_tagClick(tag);
                 }
             }
@@ -158,6 +158,7 @@ export class TagGroup extends common.TagGroup {
 
     }
 
+    // Style the tags
     private styleTags() {
 
         let AndroidColor = android.graphics.Color;

@@ -2,14 +2,13 @@
   <StackLayout>
     <Label text="{{ message }}" class="message" textWrap="true"/>
 
-    <Label text="Editables" textWrap="true" />    
+    <Label text="Editables (Default size)" textWrap="true" />    
     <Tags:TagGroup ntag_editMode="true" value="{{ tags }}" ntag_borderColor="#2095F2" ntag_textColor="#2095F2" ntag_backgroundColor="#ffffff" ntag_checkedBorderColor="#2095F2" ntag_checkedBackgroundColor="#2095F2" ntag_checkedTextColor="#ffffff" />
 
-    <Label text="Read-onlys" textWrap="true" />    
-    <Tags:TagGroup ntag_tagClick="onTagClick" value="{{ tags }}" />
+    <Label text="Read-onlys (Custom size)" textWrap="true" />    
+    <Tags:TagGroup ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_borderStrokeWidth="0.7" ntag_textSize="15" ntag_horizontalSpacing="9" ntag_verticalSpacing="5" ntag_horizontalPadding="14" ntag_verticalPadding="4" />
 
-    <Button text="Chinese Music" tap="{{ chinese }}" />
-    <Button text="Western Music" tap="{{ western }}" />
+    <Button text="Reset Tags" tap="{{ resetTags }}" />
     <Button text="Get Values" tap="onGetValues" />
     
     

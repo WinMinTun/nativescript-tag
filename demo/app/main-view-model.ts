@@ -19,15 +19,15 @@ export class HelloWorldModel extends Observable {
   constructor() {
     super();
     this.message = 'Hello Music Genres';
-    this.chinese();
+    this.resetTags();
   }
 
-  public chinese() {
-    this.tags = ['古琴', '二胡', '古筝', '琵琶'];
+  public resetTags() {
+    this.tags = ['Pop', 'Rock', 'Jazz', 'Blue', '古琴', '二胡', '古筝', '琵琶'];
   }
 
-  public western() {
-    this.tags = ['Pop', 'Rock', 'Jazz', 'Blue'];
+  public onTagClick(tag: string) {
+    alert(tag + ' clicked!');
   }
 
 }

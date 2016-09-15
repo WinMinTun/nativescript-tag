@@ -20,4 +20,5 @@ export function onTagClick(tag: string) {
 
 export function onGetValues() {
     alert(JSON.stringify(page.bindingContext.tags));
+    console.log(JSON.stringify(page.bindingContext.tags));
 }
