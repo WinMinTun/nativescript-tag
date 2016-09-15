@@ -23,6 +23,8 @@ export declare class TagGroup extends common.TagGroup {
     ntag_verticalSpacing: number;
     ntag_horizontalPadding: number;
     ntag_verticalPadding: number;
+    ntag_small: boolean;
+    ntag_large: boolean;
     constructor();
     android: any;
     ntag_editMode: boolean;

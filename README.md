@@ -1,64 +1,141 @@
-# Develop a NativeScript plugin now (w/ TypeScript)
+# Nativescrpt UI plugin for Tagging
 
-## Getting started
+## Platform Support
 
-1. `git clone https://github.com/NathanWalker/nativescript-plugin-seed.git myplugin`
-2. `npm install -g typescript`
-3. `cd myplugin`
-4. `npm run postclone`
-5. `npm run setup`
-6. Get to work.
+Currently only support Android. Any collaborator for iOS support is welcomed!
 
-This seed expands on several things [presented here](http://developer.telerik.com/featured/creating-nativescript-plugins-in-typescript/).
+##Android side
+![alt tag](https://bitbucket.org/win_min_tun/nativescript-tag/blob/master/demo/screenshots/Android.png)
 
 ## Usage
 
-The seed is prepared to allow you to test and try out your plugin via the `demo` folder.
-Additionally it provides a proper `.gitignore` to keep GitHub tidy as well as `.npmignore` to ensure everyone is happy when you publish your plugin via npm.
+The plugin is developed using nativescript plugin seed (https://github.com/NathanWalker/nativescript-plugin-seed). Pls see `demo` for full example. 
+###
+```XML
+    <Label text="Editable (Default size, Custom Color)" textWrap="true" />    
+    <Tags:TagGroup id="tag1" ntag_editMode="true" value="{{ tags }}" ntag_borderColor="#2095F2" ntag_textColor="#2095F2" ntag_backgroundColor="#ffffff" ntag_checkedBorderColor="#2095F2" ntag_checkedBackgroundColor="#2095F2" ntag_checkedTextColor="#ffffff" />
 
-### Typical development workflow:
+    <Label text="Read-only (Custom size, Default Color)" textWrap="true" />    
+    <Tags:TagGroup id="tag2" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_borderStrokeWidth="0.7" ntag_textSize="15" ntag_horizontalSpacing="9" ntag_verticalSpacing="5" ntag_horizontalPadding="14" ntag_verticalPadding="4" />
 
-1. Make changes to plugin files
-2. Make changes in `demo` that would test those changes out
-3. `npm run demo.ios` or `npm run demo.android`  **(must be run from the root directory)**
+    <Label text="Read-only (Small size, Default Color)" textWrap="true" />
+    <Tags:TagGroup id="tag3" value="{{ tags }}" ntag_small="true" />
 
-Those `demo` tasks are just general helpers. You may want to have more granular control on the device and/or emulator you want to run. For that, you can just run things the manual way:
+    <Label text="Read-only (Large size, Default Color)" textWrap="true" />
+    <Tags:TagGroup id="tag3" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_large="true" />
 
-```
-cd demo
-
-// when developing, to ensure the latest code is built into the demo, it's a guarantee to remove the plugin and add it back
-tns plugin remove nativescript-tag
-tns plugin add ..
-
-// manual platform adds
-tns platform add ios
-// and/or
-tns platform add android
-```
-
-Then use any of the available options from the `tns` command line:
-
-* [Emulate your project](https://github.com/NativeScript/nativescript-cli#emulate-your-project)
-* [Run your project](https://github.com/NativeScript/nativescript-cli#run-your-project)
-* [Full list of commands](https://github.com/NativeScript/nativescript-cli#the-commands)
-
-## Publish
-
-When you have everything ready to publish:
-
-* Bump the version number in `package.json`
-* `npm run build` - **very important** - ensure the latest is built **before** you publish
-* `npm publish`
-
-## Contributing - Want to make the seed better?
-
-Or at least help keep it up to date with NativeScript releases, which would be excellent.
+    <Label text="Editable (Custom input hint)" textWrap="true" />
+    <Tags:TagGroup id="tag4" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_inputHint="New Tag" ntag_large="true" />
 
 ```
-npm install -g typescript  // if you don't already have it
-git clone https://github.com/NathanWalker/nativescript-plugin-seed
-cd nativescript-plugin-seed
 
-// Improve!
-```
+###
+- How to add tag?
+Set `ntag_editMode="true"` in xml and press 'Enter' or tap the blank area of the tag group. (A few soft keyboard not honour the key event).
+
+- How to remove tag?
+Set `ntag_editMode="true"` in xml and press 'Backspace' or double-tap the tag to remove.
+
+## Attributes
+
+### Important attributes
+
+- **value** - *required*
+
+String array of tags for binding
+
+- **ntag_editMode - (boolean)** - *optional*
+
+Default is `false` - read only. When true, can remove and add tags by double tapping and tapping the blank area of the tag group respectively. Mutually exclusive to `ntag_tagClick` due to the native android library.
+
+- **ntag_tagClick** - *optional*
+
+Tag click event. Mutually exclusive to `ntag_editMode=true` due to the native android library.
+
+- **ntag_small or ntag_large - (boolean)** - *optional*
+
+Preset tag sizes. Mutually execlusive.
+
+- **ntag_inputHint - (string)** - *optional*
+
+Default is 'Add Tag'
+
+### Color attributes
+
+- **ntag_borderColor - (string)** - *optional*
+
+Default is #49C120
+
+- **ntag_textColor - (string)** - *optional*
+
+Default is #49C120
+
+- **ntag_backgroundColor - (string)** - *optional*
+
+Default is #FFFFFF
+
+- **ntag_dashBorderColor - (string)** - *optional*
+
+Default is #AAAAAA
+
+- **ntag_inputHintColor - (string)** - *optional*
+
+Default is #80000000
+
+- **ntag_inputTextColor - (string)** - *optional*
+
+Default is #DE000000
+
+- **ntag_checkedBorderColor - (string)** - *optional*
+
+Default is #49C120
+
+- **ntag_checkedTextColor - (string)** - *optional*
+
+Default is #FFFFFF
+
+- **ntag_checkedMarkerColor - (string)** - *optional*
+
+Default is #FFFFFF
+
+- **ntag_checkedBackgroundColor - (string)** - *optional*
+
+Default is #49C120
+
+- **ntag_pressedBackgroundColor - (string)** - *optional*
+
+Default is #EDEDED
+
+### Size attributes
+
+- **ntag_textSize - (number)** - *optional*
+
+Default is 13sp
+
+- **ntag_borderStrokeWidth - (number)** - *optional*
+
+Default is 0.5dp
+
+- **ntag_horizontalSpacing - (number)** - *optional*
+
+Default is 8dp
+
+- **ntag_verticalSpacing - (number)** - *optional*
+
+Default is 4dp
+
+- **ntag_horizontalPadding - (number)** - *optional*
+
+Default is 12dp
+
+- **ntag_verticalPadding - (number)** - *optional*
+
+Default is 3dp
+
+## Credit
+
+Credit goes to the native android library (https://github.com/2dxgujun/AndroidTagGroup) by 2dxgujun (https://github.com/2dxgujun)
+
+## Contributing - Support for iOS?
+
+Currently there is no support for iOS. Any suggestion (iOS library, etc) and/or contribution is welcomed!

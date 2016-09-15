@@ -63,6 +63,10 @@ export class TagGroup extends common.TagGroup {
     public ntag_horizontalPadding: number; // default: 12dp
     public ntag_verticalPadding: number; // default: 3dp
 
+    // preset tag sizes (mutually execulsive)
+    public ntag_small: boolean;
+    public ntag_large: boolean;
+
     constructor() {
         super();        
     }
@@ -147,7 +151,6 @@ export class TagGroup extends common.TagGroup {
             onTagClick: function(tag: string) {
                 let instance = that.get();
                 if(instance) {
-                    console.log(instance.ntag_tagClick);
                     instance.ntag_tagClick(tag);
                 }
             }
@@ -161,6 +164,7 @@ export class TagGroup extends common.TagGroup {
     // Style the tags
     private styleTags() {
 
+        // style colors
         let AndroidColor = android.graphics.Color;
 
         if (this.ntag_borderColor) {
@@ -229,46 +233,90 @@ export class TagGroup extends common.TagGroup {
             f.setInt(this._android, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
         }
 
-        if (this.ntag_inputHint) {
-            let f = this._android.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
+        // style preset sizes
+        if ((this.ntag_small || this.ntag_large) && !(this.ntag_small && this.ntag_large)) {
+
+            let textSize;
+            let hSpacing;
+            let vSpacing;
+            let hPadding;
+            let vPadding;
+
+            if (this.ntag_small) {
+                textSize = 10;
+                hSpacing = 6;
+                vSpacing = 3;
+                hPadding = 8;
+                vPadding = 2;
+            } else if (this.ntag_large) {
+                textSize = 15;
+                hSpacing = 9;
+                vSpacing = 5;
+                hPadding = 14;
+                vPadding = 4;
+                let f = this._android.getClass().getDeclaredField("borderStrokeWidth");
+                f.setAccessible(true);
+                f.setFloat(this._android, this._android.dp2px(0.7));
+            }
+            let f = this._android.getClass().getDeclaredField("textSize");
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_inputHint)); //IllegalAccessException
+            f.setFloat(this._android, this._android.sp2px(textSize));
+            f = this._android.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.setInt(this._android, this._android.dp2px(hSpacing));
+            f = this._android.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.setInt(this._android, this._android.dp2px(vSpacing));
+            f = this._android.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.setInt(this._android, this._android.dp2px(hPadding));
+            f = this._android.getClass().getDeclaredField("verticalPadding");
+            f.setAccessible(true);
+            f.setInt(this._android, this._android.dp2px(vPadding));
         }
 
+        // style custom sizes
         if (this.ntag_textSize) {
             let f = this._android.getClass().getDeclaredField("textSize"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this._android, this.ntag_textSize); //IllegalAccessException
+            f.setFloat(this._android, this._android.sp2px(this.ntag_textSize)); //IllegalAccessException
         }
 
         if (this.ntag_borderStrokeWidth) {
             let f = this._android.getClass().getDeclaredField("borderStrokeWidth"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this._android, this.ntag_borderStrokeWidth); //IllegalAccessException
+            f.setFloat(this._android, this._android.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalSpacing) {
             let f = this._android.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this.ntag_horizontalSpacing); //IllegalAccessException
+            f.setInt(this._android, this._android.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_verticalSpacing) {
             let f = this._android.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this.ntag_verticalSpacing); //IllegalAccessException
+            f.setInt(this._android, this._android.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalPadding) {
             let f = this._android.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this.ntag_horizontalPadding); //IllegalAccessException
+            f.setInt(this._android, this._android.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
         }
 
         if (this.ntag_verticalPadding) {
             let f = this._android.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this.ntag_verticalPadding); //IllegalAccessException
+            f.setInt(this._android, this._android.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
+        }
+
+        // set input hint text
+        if (this.ntag_inputHint) {
+            let f = this._android.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.set(this._android, this.ntag_inputHint); //IllegalAccessException
         }
     }
 }
