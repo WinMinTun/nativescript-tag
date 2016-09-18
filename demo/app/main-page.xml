@@ -15,7 +15,10 @@
     <Tags:TagGroup id="tag3" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_large="true" />
 
     <Label text="Editable (Custom input hint)" textWrap="true" />
-    <Tags:TagGroup id="tag4" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_editMode="true" ntag_inputHint="New Tag" ntag_large="true" />
+    <Tags:TagGroup id="tag4" value="{{ tags }}" ntag_editMode="true" ntag_inputHint="New Tag" ntag_large="true" />
+
+     <Label text="Editable (with AutoComplete)" textWrap="true" />
+    <Tags:TagGroup id="tag4" value="{{ tags }}" ntag_editMode="true" ntag_autoComplete="true" />
 
     <Button text="Reset Tags" tap="{{ resetTags }}" />
     <Button text="Get Values" tap="onGetValues" />

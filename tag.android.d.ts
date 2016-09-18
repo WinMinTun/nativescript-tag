@@ -3,8 +3,10 @@ export declare class TagGroup extends common.TagGroup {
     value: string[];
     private _android;
     private _ios;
-    private _editMode;
-    private _tagClick;
+    private _tagGroup;
+    ntag_editMode: boolean;
+    ntag_autoComplete: boolean;
+    ntag_tagClick: any;
     ntag_borderColor: string;
     ntag_textColor: string;
     ntag_backgroundColor: string;
@@ -27,8 +29,7 @@ export declare class TagGroup extends common.TagGroup {
     ntag_large: boolean;
     constructor();
     android: any;
-    ntag_editMode: boolean;
-    ntag_tagClick: any;
+    tagGroup: any;
     _createUI(): void;
     private styleTags();
 }

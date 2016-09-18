@@ -17,7 +17,7 @@ function onValuePropertyChanged(data) {
     
     // change array to java.util.List
     let tagList = java.util.Arrays.asList(data.newValue);
-    tagGroup.android.setTags(tagList);
+    tagGroup.tagGroup.setTags(tagList);
 }
 
 // common.TagGroup.valueProperty.metadata.onSetNativeValue = onValuePropertyChanged;
@@ -35,11 +35,16 @@ export class TagGroup extends common.TagGroup {
     private _android: any;
     private _ios: any;
 
+    private _tagGroup: any;
+
     // tag edit mode [false = read-only]
-    private _editMode: boolean = false;
+    public ntag_editMode: boolean = false;
+
+    // auto complete mode when _editMode
+    public ntag_autoComplete: boolean = false;
 
     // tag click callback (mutually exclusive to _editMode according to the android plugin)
-    private _tagClick;
+    public ntag_tagClick;
 
     // view properties (Colors)
     public ntag_borderColor: string; // default: #49C120
@@ -75,52 +80,81 @@ export class TagGroup extends common.TagGroup {
         return this._android;
     }
 
-    set ntag_editMode(val: boolean) {
-      if (this._editMode !== val) {
-        this._editMode = val;
-        this.notifyPropertyChange('ntag_editMode', val);
-      }
+    get tagGroup() {
+        return this._tagGroup;
     }
 
-    get ntag_editMode(): boolean {
-      return this._editMode;
-    }
-
-    set ntag_tagClick(callback) {
-      if (this._tagClick !== callback) {
-        this._tagClick = callback;
-        this.notifyPropertyChange('ntag_tagClick', callback);
-      }
-    }
-
-    get ntag_tagClick() {
-      return this._tagClick;
-    }
 
     // create native ui
     _createUI() {
 
         // for android, the library is included at platforms/android/include.gradle
-        this._android = new me.gujun.android.taggroup.TagGroup(this._context);
+        this._tagGroup = new me.gujun.android.taggroup.TagGroup(this._context);
 
         this.styleTags(); // style the tags
 
         // if edit mode
         if (this.ntag_editMode) {
-            let f = this._android.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
-            f.setAccessible(true);
-            f.setBoolean(this._android, true); //IllegalAccessException
-            
-            var tagGroup = this._android;
-            var tagGroupClickListener = new android.view.View.OnClickListener({
-                onClick: function(view) {
-                    tagGroup.submitTag();
-                }
-            });
 
-            this._android.appendInputTag();
-            this._android.setOnClickListener(tagGroupClickListener);
-        }        
+             console.log('edit mode');
+
+            if (!this.ntag_autoComplete) { // if not auto complete
+
+                // the root is the TagGroup when not auto complete
+                this._android = this.tagGroup;
+
+                // the same as android plugin TagGroup constructor
+                let f = this.tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
+                f.setAccessible(true);
+                f.setBoolean(this.tagGroup, true); //IllegalAccessException
+                
+                var tagGroup = this.tagGroup;
+                var tagGroupClickListener = new android.view.View.OnClickListener({
+                    onClick: function(view) {
+                        tagGroup.submitTag();
+                    }
+                });
+
+                this.tagGroup.appendInputTag();
+                this.tagGroup.setOnClickListener(tagGroupClickListener);
+
+            } else { // if auto complete mode
+
+                // the android plugin does not support auto complete, so extend it here
+                let ArrayAdapter = android.widget.ArrayAdapter;
+                let AutoCompleteTextView = android.widget.AutoCompleteTextView;
+                let LinearLayout = android.widget.LinearLayout;
+                let LayoutParams = android.widget.LinearLayout.LayoutParams;
+                let context = app.android.currentContext;
+
+                let root = new LinearLayout(context);
+
+                root.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+                root.setOrientation(LinearLayout.HORIZONTAL);
+
+
+                let countries = ["Belgium", "France", "Italy", "Germany", "Spain"];
+
+                // android.R.layout.simple_dropdown_item_1line = 17367050
+                let simple_dropdown_item_1line = 17367050;
+                let adapter = new ArrayAdapter<String>(context, simple_dropdown_item_1line, countries);
+                let textView = new AutoCompleteTextView(context);
+
+                textView.setAdapter(adapter);
+
+                root.addView(textView);
+                root.addView(this.tagGroup);
+
+                // if auto complete, the root is linear layout with AutoCompleteTextView & TagGroup
+                this._android = root;
+            }
+            
+        } else { // if read only mode
+
+                console.log('read only mode');
+                // the root is the TagGroup when read only
+                this._android = this.tagGroup;
+        }    
 
         var that = new WeakRef(this);
         var tagChangeListener = new me.gujun.android.taggroup.TagGroup.OnTagChangeListener({
@@ -144,7 +178,7 @@ export class TagGroup extends common.TagGroup {
         });
 
         // register OnTagChangeListener to reflect TagGroup.value property upon UI changes
-        this._android.setOnTagChangeListener(tagChangeListener);
+        this.tagGroup.setOnTagChangeListener(tagChangeListener);
 
 
         let tagClickListener = new me.gujun.android.taggroup.TagGroup.OnTagClickListener({
@@ -157,7 +191,7 @@ export class TagGroup extends common.TagGroup {
         });
         
         // register tag click listener
-        this._android.setOnTagClickListener(tagClickListener);
+        this.tagGroup.setOnTagClickListener(tagClickListener);
 
     }
 
@@ -168,69 +202,69 @@ export class TagGroup extends common.TagGroup {
         let AndroidColor = android.graphics.Color;
 
         if (this.ntag_borderColor) {
-            let f = this._android.getClass().getDeclaredField("borderColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("borderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_borderColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_borderColor)); //IllegalAccessException
         }
 
         if (this.ntag_textColor) {
-            let f = this._android.getClass().getDeclaredField("textColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("textColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_textColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_textColor)); //IllegalAccessException
         }
 
         if (this.ntag_backgroundColor) {
-            let f = this._android.getClass().getDeclaredField("backgroundColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("backgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_backgroundColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_backgroundColor)); //IllegalAccessException
         }
 
         if (this.ntag_dashBorderColor) {
-            let f = this._android.getClass().getDeclaredField("dashBorderColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("dashBorderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_dashBorderColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_dashBorderColor)); //IllegalAccessException
         }
 
         if (this.ntag_inputHintColor) {
-            let f = this._android.getClass().getDeclaredField("inputHintColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("inputHintColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_inputHintColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_inputHintColor)); //IllegalAccessException
         }
 
         if (this.ntag_inputTextColor) {
-            let f = this._android.getClass().getDeclaredField("inputTextColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("inputTextColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_inputTextColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_inputTextColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedBorderColor) {
-            let f = this._android.getClass().getDeclaredField("checkedBorderColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("checkedBorderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_checkedBorderColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedBorderColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedTextColor) {
-            let f = this._android.getClass().getDeclaredField("checkedTextColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("checkedTextColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_checkedTextColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedTextColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedMarkerColor) {
-            let f = this._android.getClass().getDeclaredField("checkedMarkerColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("checkedMarkerColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_checkedMarkerColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedMarkerColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedBackgroundColor) {
-            let f = this._android.getClass().getDeclaredField("checkedBackgroundColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("checkedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_checkedBackgroundColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedBackgroundColor)); //IllegalAccessException
         }
 
         if (this.ntag_pressedBackgroundColor) {
-            let f = this._android.getClass().getDeclaredField("pressedBackgroundColor"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("pressedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
+            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
         }
 
         // style preset sizes
@@ -254,69 +288,69 @@ export class TagGroup extends common.TagGroup {
                 vSpacing = 5;
                 hPadding = 14;
                 vPadding = 4;
-                let f = this._android.getClass().getDeclaredField("borderStrokeWidth");
+                let f = this.tagGroup.getClass().getDeclaredField("borderStrokeWidth");
                 f.setAccessible(true);
-                f.setFloat(this._android, this._android.dp2px(0.7));
+                f.setFloat(this.tagGroup, this.tagGroup.dp2px(0.7));
             }
-            let f = this._android.getClass().getDeclaredField("textSize");
+            let f = this.tagGroup.getClass().getDeclaredField("textSize");
             f.setAccessible(true);
-            f.setFloat(this._android, this._android.sp2px(textSize));
-            f = this._android.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
+            f.setFloat(this.tagGroup, this.tagGroup.sp2px(textSize));
+            f = this.tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(hSpacing));
-            f = this._android.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(hSpacing));
+            f = this.tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(vSpacing));
-            f = this._android.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(vSpacing));
+            f = this.tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(hPadding));
-            f = this._android.getClass().getDeclaredField("verticalPadding");
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(hPadding));
+            f = this.tagGroup.getClass().getDeclaredField("verticalPadding");
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(vPadding));
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(vPadding));
         }
 
         // style custom sizes
         if (this.ntag_textSize) {
-            let f = this._android.getClass().getDeclaredField("textSize"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("textSize"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this._android, this._android.sp2px(this.ntag_textSize)); //IllegalAccessException
+            f.setFloat(this.tagGroup, this.tagGroup.sp2px(this.ntag_textSize)); //IllegalAccessException
         }
 
         if (this.ntag_borderStrokeWidth) {
-            let f = this._android.getClass().getDeclaredField("borderStrokeWidth"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("borderStrokeWidth"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this._android, this._android.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
+            f.setFloat(this.tagGroup, this.tagGroup.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalSpacing) {
-            let f = this._android.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_verticalSpacing) {
-            let f = this._android.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalPadding) {
-            let f = this._android.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
         }
 
         if (this.ntag_verticalPadding) {
-            let f = this._android.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._android, this._android.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
+            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
         }
 
         // set input hint text
         if (this.ntag_inputHint) {
-            let f = this._android.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
+            let f = this.tagGroup.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
             f.setAccessible(true);
-            f.set(this._android, this.ntag_inputHint); //IllegalAccessException
+            f.set(this.tagGroup, this.ntag_inputHint); //IllegalAccessException
         }
     }
 }
