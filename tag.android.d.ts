@@ -4,6 +4,7 @@ export declare class TagGroup extends common.TagGroup {
     private _android;
     private _ios;
     private _tagGroup;
+    private _autoCompleteTextView;
     ntag_editMode: boolean;
     ntag_autoComplete: boolean;
     ntag_tagClick: any;

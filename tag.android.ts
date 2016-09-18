@@ -10,7 +10,7 @@ declare var me;
 declare var java;
 
 function onValuePropertyChanged(data) {
-    var tagGroup = data.object;
+    var tagGroup: TagGroup = data.object;
     if (!tagGroup.android) {
         return;
     }
@@ -36,6 +36,8 @@ export class TagGroup extends common.TagGroup {
     private _ios: any;
 
     private _tagGroup: any;
+    private _autoCompleteTextView: any;
+
 
     // tag edit mode [false = read-only]
     public ntag_editMode: boolean = false;
@@ -84,7 +86,6 @@ export class TagGroup extends common.TagGroup {
         return this._tagGroup;
     }
 
-
     // create native ui
     _createUI() {
 
@@ -96,31 +97,30 @@ export class TagGroup extends common.TagGroup {
         // if edit mode
         if (this.ntag_editMode) {
 
-             console.log('edit mode');
+            // the same as android plugin TagGroup constructor
+            let f = this._tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.setBoolean(this._tagGroup, true); //IllegalAccessException
 
             if (!this.ntag_autoComplete) { // if not auto complete
 
                 // the root is the TagGroup when not auto complete
-                this._android = this.tagGroup;
-
-                // the same as android plugin TagGroup constructor
-                let f = this.tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
-                f.setAccessible(true);
-                f.setBoolean(this.tagGroup, true); //IllegalAccessException
+                this._android = this._tagGroup;
                 
-                var tagGroup = this.tagGroup;
+                var tagGroup = this._tagGroup;
                 var tagGroupClickListener = new android.view.View.OnClickListener({
                     onClick: function(view) {
                         tagGroup.submitTag();
                     }
                 });
 
-                this.tagGroup.appendInputTag();
-                this.tagGroup.setOnClickListener(tagGroupClickListener);
+                this._tagGroup.appendInputTag();
+                this._tagGroup.setOnClickListener(tagGroupClickListener);
 
             } else { // if auto complete mode
 
                 // the android plugin does not support auto complete, so extend it here
+				
                 let ArrayAdapter = android.widget.ArrayAdapter;
                 let AutoCompleteTextView = android.widget.AutoCompleteTextView;
                 let LinearLayout = android.widget.LinearLayout;
@@ -130,20 +130,22 @@ export class TagGroup extends common.TagGroup {
                 let root = new LinearLayout(context);
 
                 root.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                root.setOrientation(LinearLayout.HORIZONTAL);
+                root.setOrientation(LinearLayout.VERTICAL);
 
 
                 let countries = ["Belgium", "France", "Italy", "Germany", "Spain"];
 
                 // android.R.layout.simple_dropdown_item_1line = 17367050
                 let simple_dropdown_item_1line = 17367050;
-                let adapter = new ArrayAdapter<String>(context, simple_dropdown_item_1line, countries);
-                let textView = new AutoCompleteTextView(context);
 
-                textView.setAdapter(adapter);
+				// @TODO: error here cannot create object.
+                //let adapter = new ArrayAdapter<String>(context, simple_dropdown_item_1line, countries);
+                this._autoCompleteTextView = new AutoCompleteTextView(context);
 
-                root.addView(textView);
-                root.addView(this.tagGroup);
+                //textView.setAdapter(adapter);
+
+                root.addView(this._autoCompleteTextView);
+                root.addView(this._tagGroup);
 
                 // if auto complete, the root is linear layout with AutoCompleteTextView & TagGroup
                 this._android = root;
@@ -151,9 +153,8 @@ export class TagGroup extends common.TagGroup {
             
         } else { // if read only mode
 
-                console.log('read only mode');
                 // the root is the TagGroup when read only
-                this._android = this.tagGroup;
+                this._android = this._tagGroup;
         }    
 
         var that = new WeakRef(this);
@@ -178,7 +179,7 @@ export class TagGroup extends common.TagGroup {
         });
 
         // register OnTagChangeListener to reflect TagGroup.value property upon UI changes
-        this.tagGroup.setOnTagChangeListener(tagChangeListener);
+        this._tagGroup.setOnTagChangeListener(tagChangeListener);
 
 
         let tagClickListener = new me.gujun.android.taggroup.TagGroup.OnTagClickListener({
@@ -191,7 +192,7 @@ export class TagGroup extends common.TagGroup {
         });
         
         // register tag click listener
-        this.tagGroup.setOnTagClickListener(tagClickListener);
+        this._tagGroup.setOnTagClickListener(tagClickListener);
 
     }
 
@@ -202,69 +203,69 @@ export class TagGroup extends common.TagGroup {
         let AndroidColor = android.graphics.Color;
 
         if (this.ntag_borderColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("borderColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("borderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_borderColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_borderColor)); //IllegalAccessException
         }
 
         if (this.ntag_textColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("textColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("textColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_textColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_textColor)); //IllegalAccessException
         }
 
         if (this.ntag_backgroundColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("backgroundColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("backgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_backgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_backgroundColor)); //IllegalAccessException
         }
 
         if (this.ntag_dashBorderColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("dashBorderColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("dashBorderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_dashBorderColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_dashBorderColor)); //IllegalAccessException
         }
 
         if (this.ntag_inputHintColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("inputHintColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("inputHintColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_inputHintColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_inputHintColor)); //IllegalAccessException
         }
 
         if (this.ntag_inputTextColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("inputTextColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("inputTextColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_inputTextColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_inputTextColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedBorderColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("checkedBorderColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("checkedBorderColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedBorderColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedBorderColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedTextColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("checkedTextColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("checkedTextColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedTextColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedTextColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedMarkerColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("checkedMarkerColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("checkedMarkerColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedMarkerColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedMarkerColor)); //IllegalAccessException
         }
 
         if (this.ntag_checkedBackgroundColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("checkedBackgroundColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("checkedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_checkedBackgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedBackgroundColor)); //IllegalAccessException
         }
 
         if (this.ntag_pressedBackgroundColor) {
-            let f = this.tagGroup.getClass().getDeclaredField("pressedBackgroundColor"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("pressedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
         }
 
         // style preset sizes
@@ -288,69 +289,69 @@ export class TagGroup extends common.TagGroup {
                 vSpacing = 5;
                 hPadding = 14;
                 vPadding = 4;
-                let f = this.tagGroup.getClass().getDeclaredField("borderStrokeWidth");
+                let f = this._tagGroup.getClass().getDeclaredField("borderStrokeWidth");
                 f.setAccessible(true);
-                f.setFloat(this.tagGroup, this.tagGroup.dp2px(0.7));
+                f.setFloat(this._tagGroup, this._tagGroup.dp2px(0.7));
             }
-            let f = this.tagGroup.getClass().getDeclaredField("textSize");
+            let f = this._tagGroup.getClass().getDeclaredField("textSize");
             f.setAccessible(true);
-            f.setFloat(this.tagGroup, this.tagGroup.sp2px(textSize));
-            f = this.tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
+            f.setFloat(this._tagGroup, this._tagGroup.sp2px(textSize));
+            f = this._tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(hSpacing));
-            f = this.tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(hSpacing));
+            f = this._tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(vSpacing));
-            f = this.tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(vSpacing));
+            f = this._tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(hPadding));
-            f = this.tagGroup.getClass().getDeclaredField("verticalPadding");
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(hPadding));
+            f = this._tagGroup.getClass().getDeclaredField("verticalPadding");
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(vPadding));
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(vPadding));
         }
 
         // style custom sizes
         if (this.ntag_textSize) {
-            let f = this.tagGroup.getClass().getDeclaredField("textSize"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("textSize"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this.tagGroup, this.tagGroup.sp2px(this.ntag_textSize)); //IllegalAccessException
+            f.setFloat(this._tagGroup, this._tagGroup.sp2px(this.ntag_textSize)); //IllegalAccessException
         }
 
         if (this.ntag_borderStrokeWidth) {
-            let f = this.tagGroup.getClass().getDeclaredField("borderStrokeWidth"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("borderStrokeWidth"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setFloat(this.tagGroup, this.tagGroup.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
+            f.setFloat(this._tagGroup, this._tagGroup.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalSpacing) {
-            let f = this.tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_verticalSpacing) {
-            let f = this.tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
         }
 
         if (this.ntag_horizontalPadding) {
-            let f = this.tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
         }
 
         if (this.ntag_verticalPadding) {
-            let f = this.tagGroup.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this.tagGroup, this.tagGroup.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
         }
 
         // set input hint text
         if (this.ntag_inputHint) {
-            let f = this.tagGroup.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
+            let f = this._tagGroup.getClass().getDeclaredField("inputHint"); //NoSuchFieldException
             f.setAccessible(true);
-            f.set(this.tagGroup, this.ntag_inputHint); //IllegalAccessException
+            f.set(this._tagGroup, this.ntag_inputHint); //IllegalAccessException
         }
     }
 }

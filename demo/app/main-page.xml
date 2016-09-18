@@ -1,4 +1,5 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:Tags="nativescript-tag">
+<ScrollView>
   <StackLayout>
     <Label text="{{ message }}" class="message" textWrap="true"/>
 
@@ -17,7 +18,7 @@
     <Label text="Editable (Custom input hint)" textWrap="true" />
     <Tags:TagGroup id="tag4" value="{{ tags }}" ntag_editMode="true" ntag_inputHint="New Tag" ntag_large="true" />
 
-     <Label text="Editable (with AutoComplete)" textWrap="true" />
+    <Label text="Editable (with AutoComplete)" textWrap="true" />
     <Tags:TagGroup id="tag4" value="{{ tags }}" ntag_editMode="true" ntag_autoComplete="true" />
 
     <Button text="Reset Tags" tap="{{ resetTags }}" />
@@ -25,4 +26,6 @@
     
     
   </StackLayout>
+</ScrollView>
+  
 </Page>
