@@ -6,6 +6,7 @@ export declare class TagGroup extends common.TagGroup {
     private _ios;
     private _tagGroup;
     private _autoCompleteTextView;
+    static TAG_CLICK_EVENT: string;
     ntag_editMode: boolean;
     ntag_autoComplete: boolean;
     ntag_tagClick: any;
@@ -20,7 +21,8 @@ export declare class TagGroup extends common.TagGroup {
     ntag_checkedMarkerColor: string;
     ntag_checkedBackgroundColor: string;
     ntag_pressedBackgroundColor: string;
-    ntag_autoCompleteTextColor: string;
+    ntag_acTextColor: string;
+    ntga_acPopupBg: string;
     ntag_inputHint: string;
     ntag_textSize: number;
     ntag_borderStrokeWidth: number;
@@ -36,5 +38,6 @@ export declare class TagGroup extends common.TagGroup {
     autoCompleteTags: Array<string>;
     _createUI(): void;
     private autoCompleteTagsUpdate(val);
+    private styleAutoComplete();
     private styleTags();
 }

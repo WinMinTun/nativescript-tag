@@ -17,8 +17,13 @@ export function pageLoaded(args: observable.EventData) {
     page = <pages.Page>args.object;
     viewModel = new HelloWorldModel();
     page.bindingContext = viewModel;
-    tagGroup3 = <TagGroup>page.getViewById('tag3');
-    tagGroup3.ntag_tagClick = tagClickCallback;
+    //tagGroup3 = <TagGroup>page.getViewById('tag3');
+    //tagGroup3.ntag_tagClick = tagClickCallback;
+}
+
+export function tag3Click(args) {
+    // args == { eventName: TagGroup.TAG_CLICK_EVENT, object: instance, data: tag }
+    alert(args.data + ' clicked!');
 }
 
 

@@ -21,6 +21,11 @@ function onValuePropertyChanged(data) {
     // change array to java.util.List
     let tagList = java.util.Arrays.asList(data.newValue);
     tagGroup.tagGroup.setTags(tagList);
+
+    // remove the last 'Add Tag' if auto complete
+    if (tagGroup.ntag_autoComplete) {
+        tagGroup.tagGroup.removeViewAt(tagGroup.tagGroup.getChildCount() - 1);
+    }
 }
 
 // common.TagGroup.valueProperty.metadata.onSetNativeValue = onValuePropertyChanged;
@@ -44,14 +49,16 @@ export class TagGroup extends common.TagGroup {
     private _tagGroup: any;
     private _autoCompleteTextView: any;
 
+    public static TAG_CLICK_EVENT = 'ntag_tagClick';
+
 
     // tag edit mode [false = read-only]
     public ntag_editMode: boolean = false;
 
-    // auto complete mode
+    // auto complete mode (mutually exclusive to ntag_editMode)
     public ntag_autoComplete: boolean = false;
 
-    // tag click callback (mutually exclusive to _editMode according to the android plugin)
+    // tag click callback (mutually exclusive to ntag_editMode according to the android plugin)
     public ntag_tagClick;
 
     // view properties (Colors)
@@ -66,7 +73,8 @@ export class TagGroup extends common.TagGroup {
     public ntag_checkedMarkerColor: string; // default: #FFFFFF
     public ntag_checkedBackgroundColor: string; // default: #49C120
     public ntag_pressedBackgroundColor: string; // default: #EDEDED
-    public ntag_autoCompleteTextColor: string; // default: #000000;
+    public ntag_acTextColor: string; // default: #000000;
+    public ntga_acPopupBg: string;
 
     // view properties (Input hint, Text Size and spacings)
     public ntag_inputHint: string; // default: Add Tag
@@ -112,67 +120,113 @@ export class TagGroup extends common.TagGroup {
 
         this.styleTags(); // style the tags
 
-        // if edit mode or autocomplete
-        if (this.ntag_editMode || this.ntag_autoComplete) {
+        // if edit mode
+        if (this.ntag_editMode) {
 
             // the same as android plugin TagGroup constructor
             let f = this._tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
             f.setAccessible(true);
             f.setBoolean(this._tagGroup, true); //IllegalAccessException
 
-            if (!this.ntag_autoComplete) { // if not auto complete
-
-                // the root is the TagGroup when not auto complete
-                this._android = this._tagGroup;
+             // the root is the TagGroup when not auto complete
+            this._android = this._tagGroup;
                 
-                var tagGroup = this._tagGroup;
-                var tagGroupClickListener = new android.view.View.OnClickListener({
-                    onClick: function(view) {
-                        tagGroup.submitTag();
-                    }
-                });
-
-                this._tagGroup.appendInputTag();
-                this._tagGroup.setOnClickListener(tagGroupClickListener);
-
-            } else { // if auto complete mode
-
-                // the android plugin does not support auto complete, so extend it here
-				
-                let AutoCompleteTextView = android.widget.AutoCompleteTextView;
-                let LinearLayout = android.widget.LinearLayout;
-                let LayoutParams = android.widget.LinearLayout.LayoutParams;
-                let context = app.android.context;
-
-                let root = new LinearLayout(context);
-
-                root.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                root.setOrientation(LinearLayout.VERTICAL);
-
-                this._autoCompleteTextView = new AutoCompleteTextView(context);
-                this._autoCompleteTextView.setThreshold(1);
-
-                // style autocomplete textview
-                if (!this.ntag_autoCompleteTextColor) {
-                    this._autoCompleteTextView.setTextColor(new color_1.Color('black').android);
-                } else {
-                    this._autoCompleteTextView.setTextColor(new color_1.Color(this.ntag_autoCompleteTextColor).android);
+            let tagGroup = this._tagGroup;
+            var tagGroupClickListener = new android.view.View.OnClickListener({
+                onClick: function(view) {
+                    tagGroup.submitTag();
                 }
+            });
 
-                root.addView(this._autoCompleteTextView);
-                root.addView(this._tagGroup);
-
-                // if auto complete, the root is linear layout with AutoCompleteTextView & TagGroup
-                this._android = root;
-            }
+            this._tagGroup.appendInputTag();
+            this._tagGroup.setOnClickListener(tagGroupClickListener);
             
+        } else if (this.ntag_autoComplete) { // if auto complete
+
+            // the android plugin does not support auto complete, so extend it here
+
+            let f = this._tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
+            f.setAccessible(true);
+            f.setBoolean(this._tagGroup, true); //IllegalAccessException
+				
+            let AutoCompleteTextView = android.widget.AutoCompleteTextView;
+            let LinearLayout = android.widget.LinearLayout;
+            let LayoutParams = android.widget.LinearLayout.LayoutParams;
+            let context = app.android.context;
+
+            let root = new LinearLayout(context);
+
+            root.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            root.setOrientation(LinearLayout.VERTICAL);
+
+            this._autoCompleteTextView = new AutoCompleteTextView(context);
+            this._autoCompleteTextView.setThreshold(1);
+
+            let that = new WeakRef(this);
+            let tagGroup = this._tagGroup;
+            let autoComplete = this._autoCompleteTextView;
+
+            // append tag on item clicked
+            this._autoCompleteTextView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener({
+                onItemClick: function (parent, view, position, id) {
+                    var owner = that.get();
+                    if (owner) {
+                        let currentTags = tagGroup.getTags();
+                        let newTags = new java.util.ArrayList(java.util.Arrays.asList(currentTags));
+                        newTags.add(parent.getItemAtPosition(position));
+
+                        // add tags natively
+                        tagGroup.setTags(newTags);
+                        // remove the last 'Add Tag'
+                        tagGroup.removeViewAt(tagGroup.getChildCount() - 1);
+
+                        // notify TagGroup.value (**other tags) of the native change
+                        owner._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                        autoComplete.setText(null); // clear text
+                    }
+                }
+            }));
+
+            // append tag on textview clicked
+            this._autoCompleteTextView.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function (view) {
+                    if (view.getText().toString()) {
+                        var owner = that.get();
+                        if (owner) {
+                            let currentTags = tagGroup.getTags();
+                            let newTags = new java.util.ArrayList(java.util.Arrays.asList(currentTags));
+                            newTags.add(view.getText().toString());
+
+                            // add tags natively
+                            tagGroup.setTags(newTags);
+                            // remove the last 'Add Tag'
+                            tagGroup.removeViewAt(tagGroup.getChildCount() - 1);
+
+                            // notify TagGroup.value (**other tags) of the native change
+                            owner._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                            view.setText(null); // clear text
+                        }
+                    }
+                    
+                }
+            }));
+
+
+            this.styleAutoComplete(); // style auto complete
+
+            root.addView(this._autoCompleteTextView);
+            root.addView(this._tagGroup);
+
+            // if auto complete, the root is linear layout with AutoCompleteTextView & TagGroup
+            this._android = root;
+
         } else { // if read only mode
 
                 // the root is the TagGroup when read only
                 this._android = this._tagGroup;
         }    
 
-        var that = new WeakRef(this);
+        let that = new WeakRef(this);
         var tagChangeListener = new me.gujun.android.taggroup.TagGroup.OnTagChangeListener({
             onAppend: function(tagGroup, newTag: string){
                 var instance = that.get();
@@ -200,8 +254,14 @@ export class TagGroup extends common.TagGroup {
         let tagClickListener = new me.gujun.android.taggroup.TagGroup.OnTagClickListener({
             onTagClick: function(tag: string) {
                 let instance = that.get();
-                if(instance) {
-                    instance.ntag_tagClick(tag);
+                if(instance && instance.ntag_tagClick) {
+                    // onClick event
+                    instance.notify({ eventName: TagGroup.TAG_CLICK_EVENT, object: instance, data: tag });
+
+                    // onClick for binded function
+                    if (typeof(instance.ntag_tagClick) === 'function') {
+                        instance.ntag_tagClick(tag);
+                    }
                 }
             }
         });
@@ -211,6 +271,7 @@ export class TagGroup extends common.TagGroup {
 
     }
 
+    // set suggestions to autocomplete textview
     private autoCompleteTagsUpdate(val) {
         
         let ArrayAdapter = android.widget.ArrayAdapter;
@@ -221,6 +282,21 @@ export class TagGroup extends common.TagGroup {
 
         let adapter = new ArrayAdapter(this._context, android.R.layout.simple_list_item_1, arr);
         this._autoCompleteTextView.setAdapter(adapter);
+    }
+
+    // style autocomplete textview
+    private styleAutoComplete() {
+        if (!this.ntag_acTextColor) {
+            this._autoCompleteTextView.setTextColor(new color_1.Color('black').android);
+        } else {
+            this._autoCompleteTextView.setTextColor(new color_1.Color(this.ntag_acTextColor).android);
+        }
+
+        if (!this.ntga_acPopupBg) {
+            this._autoCompleteTextView.setDropDownBackgroundDrawable(new android.graphics.drawable.ColorDrawable(new color_1.Color('#F5F8FA').android));
+        } else {
+            this._autoCompleteTextView.setDropDownBackgroundDrawable(new android.graphics.drawable.ColorDrawable(new color_1.Color(this.ntga_acPopupBg).android));
+        }
     }
 
     // Style the tags
