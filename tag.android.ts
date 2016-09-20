@@ -5,9 +5,12 @@
 import * as common from "./tag.common";
 import app = require("application");
 import proxy = require("ui/core/proxy");
+import color_1 = require('color');
 
 declare var me;
 declare var java;
+declare var android; // to compile-pass "android.R.layout.simple_list_item_1"
+declare var Array;
 
 function onValuePropertyChanged(data) {
     var tagGroup: TagGroup = data.object;
@@ -26,11 +29,14 @@ function onValuePropertyChanged(data) {
 
 require("utils/module-merge").merge(common, module.exports);
 
+
 export class TagGroup extends common.TagGroup {
 
 
     // the tags
     value: string[];
+    // autocomplete tag suggestions
+    private _autoCompleteTags: Array<string>;
 
     private _android: any;
     private _ios: any;
@@ -42,7 +48,7 @@ export class TagGroup extends common.TagGroup {
     // tag edit mode [false = read-only]
     public ntag_editMode: boolean = false;
 
-    // auto complete mode when _editMode
+    // auto complete mode
     public ntag_autoComplete: boolean = false;
 
     // tag click callback (mutually exclusive to _editMode according to the android plugin)
@@ -60,6 +66,7 @@ export class TagGroup extends common.TagGroup {
     public ntag_checkedMarkerColor: string; // default: #FFFFFF
     public ntag_checkedBackgroundColor: string; // default: #49C120
     public ntag_pressedBackgroundColor: string; // default: #EDEDED
+    public ntag_autoCompleteTextColor: string; // default: #000000;
 
     // view properties (Input hint, Text Size and spacings)
     public ntag_inputHint: string; // default: Add Tag
@@ -86,6 +93,17 @@ export class TagGroup extends common.TagGroup {
         return this._tagGroup;
     }
 
+    set autoCompleteTags(val: Array<string>) {
+        this._autoCompleteTags = val;
+        if (val) {
+            this.autoCompleteTagsUpdate(val);
+        }
+    }
+
+    get autoCompleteTags(): Array<string> {
+        return this._autoCompleteTags;
+    }
+
     // create native ui
     _createUI() {
 
@@ -94,8 +112,8 @@ export class TagGroup extends common.TagGroup {
 
         this.styleTags(); // style the tags
 
-        // if edit mode
-        if (this.ntag_editMode) {
+        // if edit mode or autocomplete
+        if (this.ntag_editMode || this.ntag_autoComplete) {
 
             // the same as android plugin TagGroup constructor
             let f = this._tagGroup.getClass().getDeclaredField("isAppendMode"); //NoSuchFieldException
@@ -121,28 +139,25 @@ export class TagGroup extends common.TagGroup {
 
                 // the android plugin does not support auto complete, so extend it here
 				
-                let ArrayAdapter = android.widget.ArrayAdapter;
                 let AutoCompleteTextView = android.widget.AutoCompleteTextView;
                 let LinearLayout = android.widget.LinearLayout;
                 let LayoutParams = android.widget.LinearLayout.LayoutParams;
-                let context = app.android.currentContext;
+                let context = app.android.context;
 
                 let root = new LinearLayout(context);
 
                 root.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
                 root.setOrientation(LinearLayout.VERTICAL);
 
-
-                let countries = ["Belgium", "France", "Italy", "Germany", "Spain"];
-
-                // android.R.layout.simple_dropdown_item_1line = 17367050
-                let simple_dropdown_item_1line = 17367050;
-
-				// @TODO: error here cannot create object.
-                //let adapter = new ArrayAdapter<String>(context, simple_dropdown_item_1line, countries);
                 this._autoCompleteTextView = new AutoCompleteTextView(context);
+                this._autoCompleteTextView.setThreshold(1);
 
-                //textView.setAdapter(adapter);
+                // style autocomplete textview
+                if (!this.ntag_autoCompleteTextColor) {
+                    this._autoCompleteTextView.setTextColor(new color_1.Color('black').android);
+                } else {
+                    this._autoCompleteTextView.setTextColor(new color_1.Color(this.ntag_autoCompleteTextColor).android);
+                }
 
                 root.addView(this._autoCompleteTextView);
                 root.addView(this._tagGroup);
@@ -194,6 +209,18 @@ export class TagGroup extends common.TagGroup {
         // register tag click listener
         this._tagGroup.setOnTagClickListener(tagClickListener);
 
+    }
+
+    private autoCompleteTagsUpdate(val) {
+        
+        let ArrayAdapter = android.widget.ArrayAdapter;
+        let arr = Array.create(java.lang.String, val.length);
+        val.forEach(function (item, index) {
+            arr[index] = item;
+        });
+
+        let adapter = new ArrayAdapter(this._context, android.R.layout.simple_list_item_1, arr);
+        this._autoCompleteTextView.setAdapter(adapter);
     }
 
     // Style the tags

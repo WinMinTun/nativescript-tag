@@ -1,6 +1,7 @@
 import * as common from "./tag.common";
 export declare class TagGroup extends common.TagGroup {
     value: string[];
+    private _autoCompleteTags;
     private _android;
     private _ios;
     private _tagGroup;
@@ -19,6 +20,7 @@ export declare class TagGroup extends common.TagGroup {
     ntag_checkedMarkerColor: string;
     ntag_checkedBackgroundColor: string;
     ntag_pressedBackgroundColor: string;
+    ntag_autoCompleteTextColor: string;
     ntag_inputHint: string;
     ntag_textSize: number;
     ntag_borderStrokeWidth: number;
@@ -31,6 +33,8 @@ export declare class TagGroup extends common.TagGroup {
     constructor();
     android: any;
     tagGroup: any;
+    autoCompleteTags: Array<string>;
     _createUI(): void;
+    private autoCompleteTagsUpdate(val);
     private styleTags();
 }

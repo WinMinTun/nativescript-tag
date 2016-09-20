@@ -4,6 +4,7 @@ export class HelloWorldModel extends Observable {
 
   public message: string;
   private _tags: string[];
+  public autoCompleteTags: Array<string>;
 
   set tags(val: string[]) {
     if (this._tags !== val) {
@@ -19,6 +20,7 @@ export class HelloWorldModel extends Observable {
   constructor() {
     super();
     this.message = 'Hello Music Genres';
+    this.autoCompleteTags = ['Rap', 'Raggie', 'Hip Hop', 'DJ'];
     this.resetTags();
   }
 
