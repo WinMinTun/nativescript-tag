@@ -6,7 +6,7 @@ NativeScript UI plugin for tagging with rich features including autocomplete
 Currently only support Android. Any collaborator for iOS support is welcomed!
 
 ##Android side
-![alt tag](https://bytebucket.org/win_min_tun/nativescript-tag/raw/a498db5bf1dfba22dc13e50b6f275af72ba8561a/demo/screenshots/Android.png)
+![alt tag](https://bytebucket.org/win_min_tun/nativescript-tag/raw/89186c909f464c089e64df0ad79907ca6277403a/demo/screenshots/Android.png)
 
 ## Usage
 
