@@ -82,10 +82,6 @@ Default is 'Add Tag'
 
 ### Color attributes
 
-- **ntag_acTextColor - (string)** - *optional*
-
-Default is #000000
-
 - **ntga_acPopupBg - (string)** - *optional*
 
 Background color for autocomplete popup. Default is #F5F8FA

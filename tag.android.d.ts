@@ -21,7 +21,6 @@ export declare class TagGroup extends common.TagGroup {
     ntag_checkedMarkerColor: string;
     ntag_checkedBgColor: string;
     ntag_pressedBgColor: string;
-    ntag_acTextColor: string;
     ntga_acPopupBg: string;
     ntag_inputHint: string;
     ntag_textSize: number;

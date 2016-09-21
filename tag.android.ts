@@ -73,7 +73,6 @@ export class TagGroup extends common.TagGroup {
     public ntag_checkedMarkerColor: string; // default: #FFFFFF
     public ntag_checkedBgColor: string; // default: #49C120
     public ntag_pressedBgColor: string; // default: #EDEDED
-    public ntag_acTextColor: string; // default: #000000;
     public ntga_acPopupBg: string; // default: #F5F8FA;
 
     // view properties (Input hint, Text Size and spacings)
@@ -286,10 +285,10 @@ export class TagGroup extends common.TagGroup {
 
     // style autocomplete textview
     private styleAutoComplete() {
-        if (!this.ntag_acTextColor) {
-            this._autoCompleteTextView.setTextColor(new color_1.Color('black').android);
+        if (!this.ntag_inputTextColor) {
+            this._autoCompleteTextView.setTextColor(new color_1.Color('#DE000000').android);
         } else {
-            this._autoCompleteTextView.setTextColor(new color_1.Color(this.ntag_acTextColor).android);
+            this._autoCompleteTextView.setTextColor(new color_1.Color(this.ntag_inputTextColor).android);
         }
 
         if (!this.ntga_acPopupBg) {
@@ -297,6 +296,25 @@ export class TagGroup extends common.TagGroup {
         } else {
             this._autoCompleteTextView.setDropDownBackgroundDrawable(new android.graphics.drawable.ColorDrawable(new color_1.Color(this.ntga_acPopupBg).android));
         }
+
+        if (this.ntag_inputHint) {
+            this._autoCompleteTextView.setHint(this.ntag_inputHint);
+        }
+
+        if (!this.ntag_inputHintColor) {
+            this._autoCompleteTextView.setHintTextColor(new color_1.Color('#80000000').android);
+        } else {
+            this._autoCompleteTextView.setHintTextColor(new color_1.Color(this.ntag_inputHintColor).android);
+        }
+
+        if (!this.ntag_textSize) {
+            let textSize = this._tagGroup.sp2px(13.0);
+            this._autoCompleteTextView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, textSize);
+        } else {
+            let textSize = this._tagGroup.sp2px(this.ntag_textSize);
+            this._autoCompleteTextView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, textSize);
+        }
+        
     }
 
     // Style the tags
