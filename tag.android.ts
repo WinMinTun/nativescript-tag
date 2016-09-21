@@ -64,26 +64,26 @@ export class TagGroup extends common.TagGroup {
     // view properties (Colors)
     public ntag_borderColor: string; // default: #49C120
     public ntag_textColor: string; // default: #49C120
-    public ntag_backgroundColor: string; // default: #FFFFFF
+    public ntag_bgColor: string; // default: #FFFFFF
     public ntag_dashBorderColor: string; // default: #AAAAAA
     public ntag_inputHintColor: string; // default: #80000000
     public ntag_inputTextColor: string; // default: #DE000000
     public ntag_checkedBorderColor: string; // default: #49C120
     public ntag_checkedTextColor: string; // default: #FFFFFF
     public ntag_checkedMarkerColor: string; // default: #FFFFFF
-    public ntag_checkedBackgroundColor: string; // default: #49C120
-    public ntag_pressedBackgroundColor: string; // default: #EDEDED
+    public ntag_checkedBgColor: string; // default: #49C120
+    public ntag_pressedBgColor: string; // default: #EDEDED
     public ntag_acTextColor: string; // default: #000000;
-    public ntga_acPopupBg: string;
+    public ntga_acPopupBg: string; // default: #F5F8FA;
 
     // view properties (Input hint, Text Size and spacings)
     public ntag_inputHint: string; // default: Add Tag
     public ntag_textSize: number; // default: 13sp
     public ntag_borderStrokeWidth: number; // default: 0.5dp
-    public ntag_horizontalSpacing: number; // default: 8dp
-    public ntag_verticalSpacing: number; // default: 4dp
-    public ntag_horizontalPadding: number; // default: 12dp
-    public ntag_verticalPadding: number; // default: 3dp
+    public ntag_hSpacing: number; // default: 8dp
+    public ntag_vSpacing: number; // default: 4dp
+    public ntag_hPadding: number; // default: 12dp
+    public ntag_vPadding: number; // default: 3dp
 
     // preset tag sizes (mutually execulsive)
     public ntag_small: boolean;
@@ -317,10 +317,10 @@ export class TagGroup extends common.TagGroup {
             f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_textColor)); //IllegalAccessException
         }
 
-        if (this.ntag_backgroundColor) {
+        if (this.ntag_bgColor) {
             let f = this._tagGroup.getClass().getDeclaredField("backgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_backgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_bgColor)); //IllegalAccessException
         }
 
         if (this.ntag_dashBorderColor) {
@@ -359,16 +359,16 @@ export class TagGroup extends common.TagGroup {
             f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedMarkerColor)); //IllegalAccessException
         }
 
-        if (this.ntag_checkedBackgroundColor) {
+        if (this.ntag_checkedBgColor) {
             let f = this._tagGroup.getClass().getDeclaredField("checkedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedBackgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_checkedBgColor)); //IllegalAccessException
         }
 
-        if (this.ntag_pressedBackgroundColor) {
+        if (this.ntag_pressedBgColor) {
             let f = this._tagGroup.getClass().getDeclaredField("pressedBackgroundColor"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_pressedBackgroundColor)); //IllegalAccessException
+            f.setInt(this._tagGroup, AndroidColor.parseColor(this.ntag_pressedBgColor)); //IllegalAccessException
         }
 
         // style preset sizes
@@ -426,28 +426,28 @@ export class TagGroup extends common.TagGroup {
             f.setFloat(this._tagGroup, this._tagGroup.dp2px(this.ntag_borderStrokeWidth)); //IllegalAccessException
         }
 
-        if (this.ntag_horizontalSpacing) {
+        if (this.ntag_hSpacing) {
             let f = this._tagGroup.getClass().getDeclaredField("horizontalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_horizontalSpacing)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_hSpacing)); //IllegalAccessException
         }
 
-        if (this.ntag_verticalSpacing) {
+        if (this.ntag_vSpacing) {
             let f = this._tagGroup.getClass().getDeclaredField("verticalSpacing"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_verticalSpacing)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_vSpacing)); //IllegalAccessException
         }
 
-        if (this.ntag_horizontalPadding) {
+        if (this.ntag_hPadding) {
             let f = this._tagGroup.getClass().getDeclaredField("horizontalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_horizontalPadding)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_hPadding)); //IllegalAccessException
         }
 
-        if (this.ntag_verticalPadding) {
+        if (this.ntag_vPadding) {
             let f = this._tagGroup.getClass().getDeclaredField("verticalPadding"); //NoSuchFieldException
             f.setAccessible(true);
-            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_verticalPadding)); //IllegalAccessException
+            f.setInt(this._tagGroup, this._tagGroup.dp2px(this.ntag_vPadding)); //IllegalAccessException
         }
 
         // set input hint text

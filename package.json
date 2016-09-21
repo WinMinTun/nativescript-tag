@@ -1,6 +1,6 @@
 {
   "name": "nativescript-tag",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "NativeScript UI plugin for tagging",
   "main": "tag.js",
   "typings": "index.d.ts",
@@ -23,14 +23,13 @@
     "url": "https://bitbucket.org/win_min_tun/nativescript-tag.git"
   },
   "keywords": [
-    "NativeScript Tag",
-    "NativeScript Tagging",
     "NativeScript",
     "JavaScript",
     "Android",
     "iOS",
     "Tag",
-    "Tagging"
+    "Tagging",
+    "AutoComplete"
   ],
   "author": {
     "name": "Win Min Tun",
