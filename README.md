@@ -6,20 +6,18 @@ NativeScript UI plugin for tagging with rich features including autocomplete
 Currently only support Android. Any collaborator for iOS support is welcomed!
 
 ##Android side
-![alt tag](https://bytebucket.org/win_min_tun/nativescript-tag/raw/89186c909f464c089e64df0ad79907ca6277403a/demo/screenshots/Android.png)
+![alt tag](https://bytebucket.org/win_min_tun/nativescript-tag/raw/ae7c2b070de75c81898493d4b5d26892321612c9/demo/screenshots/Android.png)
 
 ## Usage
 
 The plugin is developed using nativescript plugin seed (https://github.com/NathanWalker/nativescript-plugin-seed). Pls see `demo` for full example. 
 ###
 ```XML
-    <Label text="{{ message }}" class="message" textWrap="true"/>
-
     <Label text="Editable (Default size, Custom Color)" textWrap="true" />    
     <Tags:TagGroup id="tag1" ntag_editMode="true" value="{{ tags }}" ntag_borderColor="#2095F2" ntag_textColor="#2095F2" ntag_bgColor="#ffffff" ntag_checkedBorderColor="#2095F2" ntag_checkedBgColor="#2095F2" ntag_checkedTextColor="#ffffff" />
 
     <Label text="Editable (with AutoComplete)" textWrap="true" />
-    <Tags:TagGroup id="tag4" value="{{ tags }}" autoCompleteTags="{{ autoCompleteTags }}" ntag_autoComplete="true" />
+    <Tags:TagGroup id="tag4" value="{{ tags }}" autoCompleteTags="{{ autoCompleteTags }}" ntag_autoComplete="true" ntag_inputHint="Add Tags" ntag_inputTextColor="red" />
 
     <Label text="Read-only (Custom size, Default Color)" textWrap="true" />    
     <Tags:TagGroup id="tag2" ntag_tagClick="{{ onTagClick }}" value="{{ tags }}" ntag_borderStrokeWidth="0.7" ntag_textSize="15" ntag_hSpacing="9" ntag_vSpacing="5" ntag_hPadding="14" ntag_vPadding="4" />
@@ -158,7 +156,7 @@ Default is 3dp
 
 ## Credit
 
-Credit goes to the native android library (https://github.com/2dxgujun/AndroidTagGroup) by 2dxgujun (https://github.com/2dxgujun)
+Credit goes to the native android library (https://github.com/2dxgujun/AndroidTagGroup) by Jun Gu (https://github.com/2dxgujun)
 
 ## Contributing - Support for iOS?
 
