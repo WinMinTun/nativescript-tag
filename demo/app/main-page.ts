@@ -29,6 +29,7 @@ export function tag3Click(args) {
 
 
 export function onGetValues() {
-    alert(JSON.stringify(page.bindingContext.tags));
-    console.log(JSON.stringify(page.bindingContext.tags));
+    page.bindingContext.tags.forEach(element => {
+        console.log(element);
+    });
 }

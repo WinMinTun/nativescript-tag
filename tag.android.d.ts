@@ -37,6 +37,7 @@ export declare class TagGroup extends common.TagGroup {
     autoCompleteTags: Array<string>;
     _createUI(): void;
     private autoCompleteTagsUpdate(val);
+    private convertJavaToJSArr(newTags);
     private styleAutoComplete();
     private styleTags();
 }

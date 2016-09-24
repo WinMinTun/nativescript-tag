@@ -17,9 +17,15 @@ function onValuePropertyChanged(data) {
     if (!tagGroup.android) {
         return;
     }
+
+    // change js array to java array
+    let arrJava = Array.create(java.lang.String, data.newValue.length);
+    data.newValue.forEach(function (item, index) {
+        arrJava[index] = item;
+    });
     
-    // change array to java.util.List
-    let tagList = java.util.Arrays.asList(data.newValue);
+    // change java array to java.util.List
+    let tagList = java.util.Arrays.asList(arrJava);
     tagGroup.tagGroup.setTags(tagList);
 
     // remove the last 'Add Tag' if auto complete
@@ -119,6 +125,8 @@ export class TagGroup extends common.TagGroup {
 
         this.styleTags(); // style the tags
 
+        let thisObj = this;
+
         // if edit mode
         if (this.ntag_editMode) {
 
@@ -180,7 +188,7 @@ export class TagGroup extends common.TagGroup {
                         tagGroup.removeViewAt(tagGroup.getChildCount() - 1);
 
                         // notify TagGroup.value (**other tags) of the native change
-                        owner._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                        owner._onPropertyChangedFromNative(TagGroup.valueProperty, thisObj.convertJavaToJSArr(newTags.toArray()));
                         autoComplete.setText(null); // clear text
                     }
                 }
@@ -202,7 +210,7 @@ export class TagGroup extends common.TagGroup {
                             tagGroup.removeViewAt(tagGroup.getChildCount() - 1);
 
                             // notify TagGroup.value (**other tags) of the native change
-                            owner._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                            owner._onPropertyChangedFromNative(TagGroup.valueProperty, thisObj.convertJavaToJSArr(newTags.toArray()));
                             view.setText(null); // clear text
                         }
                     }
@@ -232,7 +240,7 @@ export class TagGroup extends common.TagGroup {
                 if (instance) {
                     let newTags = new java.util.ArrayList(java.util.Arrays.asList(tagGroup.getTags()));
                     // notify TagGroup.value of the native change
-                    instance._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                    instance._onPropertyChangedFromNative(TagGroup.valueProperty, thisObj.convertJavaToJSArr(newTags.toArray()));
                 }
             },
 
@@ -241,7 +249,7 @@ export class TagGroup extends common.TagGroup {
                 if (instance) {
                     let newTags = new java.util.ArrayList(java.util.Arrays.asList(tagGroup.getTags()));
                     // notify TagGroup.value of the native change
-                    instance._onPropertyChangedFromNative(TagGroup.valueProperty, newTags.toArray());
+                    instance._onPropertyChangedFromNative(TagGroup.valueProperty, thisObj.convertJavaToJSArr(newTags.toArray()));
                 }
             }
         });
@@ -281,6 +289,16 @@ export class TagGroup extends common.TagGroup {
 
         let adapter = new ArrayAdapter(this._context, android.R.layout.simple_list_item_1, arr);
         this._autoCompleteTextView.setAdapter(adapter);
+    }
+
+    // Convert Java to JS Array
+    private convertJavaToJSArr(newTags) {
+        let newTagsJs = [];
+        // convert java array to javascript one
+        for (let i=0; i<newTags.length; i++) {
+            newTagsJs.push(newTags[i]);
+        }
+        return newTagsJs;
     }
 
     // style autocomplete textview
